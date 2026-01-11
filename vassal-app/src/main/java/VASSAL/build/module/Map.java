@@ -35,6 +35,7 @@ import VASSAL.build.module.map.Drawable;
 import VASSAL.build.module.map.Flare;
 import VASSAL.build.module.map.ForwardToChatter;
 import VASSAL.build.module.map.ForwardToKeyBuffer;
+import VASSAL.build.module.frontpolygon.FrontPolygon;
 import VASSAL.build.module.map.GlobalMap;
 import VASSAL.build.module.map.HidePiecesButton;
 import VASSAL.build.module.map.HighlightLastMoved;
@@ -280,6 +281,7 @@ public class Map extends AbstractToolbarItem implements GameComponent, MouseList
   protected PropertyChangeListener repaintOnPropertyChange = evt -> repaint();
   protected PieceMover pieceMover;
   protected KeyBufferer keyBufferer;
+  protected FrontPolygon frontPolygon;
   protected KeyListener[] saveKeyListeners = null;
 
   protected NamedKeyStrokeListener showKeyListener;
@@ -1002,6 +1004,10 @@ public class Map extends AbstractToolbarItem implements GameComponent, MouseList
         new KeyStrokeSource(theMap, JComponent.WHEN_IN_FOCUSED_WINDOW));
     }
 
+    if (frontPolygon == null) {
+      frontPolygon = new FrontPolygon(this);
+    }
+
     // Fix for bug 1630993: toolbar buttons not appearing
     toolBar.addHierarchyListener(new HierarchyListener() {
       @Override
@@ -1099,6 +1105,12 @@ public class Map extends AbstractToolbarItem implements GameComponent, MouseList
   @Override
   public void removeFrom(Buildable b) {
     final GameModule g = GameModule.getGameModule();
+
+    if (frontPolygon != null) {
+      frontPolygon.dispose();
+      frontPolygon = null;
+    }
+
     g.getGameState().removeGameComponent(this);
 
     g.getToolBar().remove(getLaunchButton());
@@ -4201,4 +4213,3 @@ public class Map extends AbstractToolbarItem implements GameComponent, MouseList
     }
   }
 }
-
